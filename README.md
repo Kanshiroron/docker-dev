@@ -15,10 +15,10 @@ Watch for changes in the`/go/src` folder.
 To run this image:
 
 ```bash
-$ docker run -ti -e SOFT_FOLDER=test -v $(pwd)/src:/go/src:ro -v <your_gopath>:/gopath:ro dev/golang
+$ docker run -ti -e SOFT_FOLDER=test -v <your_project_folder>/src:/go/src:ro -v <your_gopath>:/gopath:ro dev/golang
 ```
 
-- `SOFT_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `$(pwd)/src/test` (`/go/src/test` in the container).
+- `SOFT_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
 - `<your_gopath>`: this binding is optional. Add it if your project is not included in your gopath.
 
 ## PostgreSQL
