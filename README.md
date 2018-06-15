@@ -6,7 +6,7 @@ This repository gather some Docker images that helps for development. They basic
 
 To build a single image, you can run `make <folder_name>`. To build all images: `make all`. You can change versions by editing the `Makefile`.
 
-## GoLang
+## GoLang
 
 [Website](https://golang.org/) - [Base image](https://hub.docker.com/_/golang/)
 
@@ -21,7 +21,7 @@ $ docker run -ti -e SOFT_FOLDER=test -v $(pwd)/src:/go/src:ro -v <your_gopath>:/
 - `SOFT_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `$(pwd)/src/test` (`/go/src/test` in the container).
 - `<your_gopath>`: this binding is optional. Add it if your project is not included in your gopath.
 
-## PostgreSQL
+## PostgreSQL
 
 [Website](https://www.postgresql.org/) - [Base image](https://hub.docker.com/_/postgres/)
 
