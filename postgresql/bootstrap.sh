@@ -52,8 +52,8 @@ function loadPSQL() {
 	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "GRANT ALL PRIVILEGES ON DATABASE ${USER_DB} TO ${POSTGRES_USER};"
 
 	echo "INFO :: Loading database schema"
-	for i in $(cat ${order_file}); do
-		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -f ${watch_folder}/${watch_folder} ${USER_DB}
+	for psql_file in $(cat ${order_file}); do
+		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -f ${watch_folder}/${psql_file} ${USER_DB}
 	done
 }
 
