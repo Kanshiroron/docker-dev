@@ -58,6 +58,7 @@ function loadPSQL() {
 }
 
 # load PSQL for the first time
+sleep 5
 echo "INFO :: Loading PostgreSQL schema"
 loadPSQL
 
