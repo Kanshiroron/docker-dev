@@ -28,20 +28,20 @@ function compile() {
 		# killing existing service if any
 		if [ -f ${GOPID} ]; then
 			# killing old process
-			echo -e "\n\n\nINFO :: Killing old process ${output_bin}"
 			pid=$(cat ${GOPID})
+			echo -e "\n\n\nINFO :: Killing old process ${output_bin} (${pid})"
 			kill ${pid}
 
 			# Waiting for old process to stop
 			echo "INFO :: Waiting for old process to stop"
-			while [ $(ps aux | awk '{print $2}' | grep ${pid}) ]; do sleep 1; done
-			rm ${GOPID} $(which ${output_bin})
+			while ps aux | awk '{print $2}' | grep ${pid}; do sleep 1; done
+			rm ${GOPID} ${exec_bin}
 		fi
 
 		# starting service
 		echo "INFO :: Starting service"
 		mv ${output_bin} ${exec_bin} # moving to /tmp in case /go/bin is tmpfs (noexec)
-		${exec_bin} &
+		${exec_bin} ${SOFT_ARGS} &
 		echo $! > ${GOPID}
 	fi
 }

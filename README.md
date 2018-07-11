@@ -19,6 +19,7 @@ $ docker run -ti -e SOFT_FOLDER=test -v <your_project_folder>/src:/go/src:ro -v 
 ```
 
 - `SOFT_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
+- `SOFT_ARGS`: arguments to add to your software (optional).
 - `<your_gopath>`: this binding is optional. Add it if your project is not included in your gopath.
 
 Since building will be really frequent, we recommend you mounting both `/go/bin` and `/go/pkg` as `tmpfs` ([docker documentation](https://docs.docker.com/storage/tmpfs/)).
