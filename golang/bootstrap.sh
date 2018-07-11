@@ -5,6 +5,9 @@ if ! [ -n "${SOFT_FOLDER}" ]; then
 	echo "ERROR :: You must specify which folder to watch through the variable SOFT_FOLDER (below the 'src' folder)"
 	exit 1
 fi
+if [ -n "${COMPILE_ONLY}" ]; then
+	echo "INFO :: Compile only"
+fi
 
 # checking if folder is mounted
 BASE_FOLDER=/go/src
@@ -25,6 +28,14 @@ function compile() {
 
 	# restart service if compilation went well
 	if [ $? -eq 0 ]; then
+		# exit if compile only
+		if [ -n "${COMPILE_ONLY}" ] && ${COMPILE_ONLY}; then
+			if [ -n "${UID}" ]; then
+				chown ${UID} ${output_bin}
+			fi
+			return
+		fi
+
 		# killing existing service if any
 		if [ -f ${GOPID} ]; then
 			# killing old process
