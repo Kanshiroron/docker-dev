@@ -26,7 +26,7 @@ $ docker run -ti -e SOFT_FOLDER=test -v <your_project_folder>/src:/go/src:ro -v 
 
 Since building will be really frequent, we recommend you mounting both `/go/bin` and `/go/pkg` as `tmpfs` ([docker documentation](https://docs.docker.com/storage/tmpfs/)).
 
-## PostgreSQL
+## PostgreSQL single
 
 [Website](https://www.postgresql.org/) - [Base image](https://hub.docker.com/_/postgres/)
 
@@ -41,6 +41,29 @@ $ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POST
 - `POSTGRES_USER`: PosgreSQL user name. Optional, defaults to `postgres`
 - `POSTGRES_PASSWORD`: PosgreSQL user password. Optional, defaults to `password`
 - `POSTGRES_DB`: PostgreSQL database. Optional, defaults to `mydb`. You CAN'T use `postgres`.
+
+You can also use other options listed in the [official image](https://hub.docker.com/_/postgres/).
+
+## PostgreSQL mulitiple
+
+[Website](https://www.postgresql.org/) - [Base image](https://hub.docker.com/_/postgres/)
+
+Works basically the same as the `PostgreSQL single` multiple image, but designed for micro-services as it watches for multiple folders. Each folder being tied to a database. You also need an order file in each folder (see `PostgreSQL single`). **Your folders can't have any space or special characters in their name.**
+
+To run this image:
+
+```bash
+$ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword \
+	-v $(pwd)/service1/sql:/psql/service1:ro -e SERVICE1_DB=myservice -e SERVICE1_USER=myserviceuser -e SERVICE1_PASSWORD=myservicepassword \
+	-v $(pwd)/service2/sql:/psql/service2:ro \
+	dev/postgresql
+```
+
+- `POSTGRES_USER`: PosgreSQL user name. Optional, defaults to `postgres`
+- `POSTGRES_PASSWORD`: PosgreSQL user password. Optional, defaults to `password`
+- `<FOLDER_NAME | UPPERCASE>_DB`: Name of the database for the `FOLDER_NAME` service. Optional, defaults to the folder name, lower case.
+- `<FOLDER_NAME | UPPERCASE>_USER`: Name of the database user for the `FOLDER_NAME` service. Optional, defaults to the folder name, lower case.
+- `<FOLDER_NAME | UPPERCASE>_PASSWORD`: Name of the database user password for the `FOLDER_NAME` service. Optional, defaults to the folder name, lower case.
 
 You can also use other options listed in the [official image](https://hub.docker.com/_/postgres/).
 
