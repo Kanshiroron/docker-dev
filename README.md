@@ -44,7 +44,7 @@ $ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POST
 
 You can also use other options listed in the [official image](https://hub.docker.com/_/postgres/).
 
-## PostgreSQL mulitiple
+## PostgreSQL multiple
 
 [Website](https://www.postgresql.org/) - [Base image](https://hub.docker.com/_/postgres/)
 
