@@ -35,7 +35,7 @@ Watch for changes in the `/psql`. When a event occurs, it closes all db connecti
 To run this image:
 
 ```bash
-$ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -v $(pwd):/psql:ro dev/postgresql
+$ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -v $(pwd):/psql:ro dev/postgresql_single
 ```
 
 - `POSTGRES_USER`: PosgreSQL user name. Optional, defaults to `postgres`
@@ -48,7 +48,7 @@ You can also use other options listed in the [official image](https://hub.docker
 
 [Website](https://www.postgresql.org/) - [Base image](https://hub.docker.com/_/postgres/)
 
-Works basically the same as the `PostgreSQL single` multiple image, but designed for micro-services as it watches for multiple folders. Each folder being tied to a database. You also need an order file in each folder (see `PostgreSQL single`). **Your folders can't have any space or special characters in their name.**
+Works basically the same as the `PostgreSQL single` image, but designed for micro-services as it watches for multiple folders. Each folder being tied to a database. You also need an order file in each folder (see `PostgreSQL single`). **Your folders can't have any space or special characters in their name.**
 
 To run this image:
 
@@ -56,7 +56,7 @@ To run this image:
 $ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword \
 	-v $(pwd)/service1/sql:/psql/service1:ro -e SERVICE1_DB=myservice -e SERVICE1_USER=myserviceuser -e SERVICE1_PASSWORD=myservicepassword \
 	-v $(pwd)/service2/sql:/psql/service2:ro \
-	dev/postgresql
+	dev/postgresql_multiple
 ```
 
 - `POSTGRES_USER`: PosgreSQL user name. Optional, defaults to `postgres`
@@ -71,4 +71,4 @@ You can also use other options listed in the [official image](https://hub.docker
 
 [Website](https://www.timescale.com/) - [Base image](https://hub.docker.com/r/timescale/timescaledb-postgis/)
 
-Works the same way as PostgreSQL image.
+Works the same way as the `PostgreSQL single` image.
