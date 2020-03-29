@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+[ -n "${DEBUG}" ] && set -x
 
 # checking if watch folder is mounted
 watch_folder="/psql"
@@ -79,6 +80,24 @@ while ! pg_isready -U ${POSTGRES_USER}; do sleep 1; done
 sleep 5
 
 # load function
+function loadSQLFiles {
+	# args:
+	# 1: folder
+	# 2: db name
+	# 3: db user
+	# 4: db user password
+	for psql_file in $(cat ${1}/${order_file_name}); do
+		if [ "$(basename "${psql_file}")" = "${order_file_name}" ]; then
+			new_folder="${1}/$(dirname ${psql_file})"
+			loadSQLFiles "${new_folder}" "${2}" "${3}" "${4}"
+		else
+			echo "INFO :: Importing ${1}/${psql_file}"
+			PGPASSWORD=${4} psql -U ${3} -f ${1}/${psql_file} ${2}
+		fi
+	done
+}
+
+# watch function
 function watchPSQL {
 	# args:
 	# 1: folder name
@@ -95,10 +114,7 @@ function watchPSQL {
 		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "GRANT ALL PRIVILEGES ON DATABASE ${2} TO ${3};"
 
 		echo "INFO :: Loading database schema"
-		for psql_file in $(cat ${watch_folder}/${1}/${order_file_name}); do
-			echo "INFO :: Importing ${watch_folder}/${1}/${psql_file}"
-			PGPASSWORD=${4} psql -U ${3} -f ${watch_folder}/${1}/${psql_file} ${2}
-		done
+		loadSQLFiles "${watch_folder}/${1}" "${2}" "${3}" "${4}"
 
 		# waiting for inotify
 		inotifywait -e create -e delete -e modify -e moved_to -r ${watch_folder}/${1}
@@ -115,5 +131,5 @@ done
 
 # waiting until the end of time
 while true; do
-	sleep 60
+	sleep 3600
 done

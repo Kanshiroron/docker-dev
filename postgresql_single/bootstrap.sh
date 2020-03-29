@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+[ -n "${DEBUG}" ] && set -x
 
 # checking if watch folder is mounted
 watch_folder="/psql"
@@ -42,6 +43,24 @@ echo "INFO :: Waiting for PostgreSQL to be up"
 while ! pg_isready -U ${POSTGRES_USER}; do sleep 1; done
 
 # load function
+function loadSQLFiles {
+	# args:
+	# 1: folder
+	# 2: db name
+	# 3: db user
+	# 4: db user password
+	for psql_file in $(cat ${1}/${order_file_name}); do
+		if [ "$(basename "${psql_file}")" = "${order_file_name}" ]; then
+			new_folder="${1}/$(dirname ${psql_file})"
+			loadSQLFiles "${new_folder}" "${2}" "${3}" "${4}"
+		else
+			echo "INFO :: Importing ${1}/${psql_file}"
+			PGPASSWORD=${4} psql -U ${3} -f ${1}/${psql_file} ${2}
+		fi
+	done
+}
+
+# watch function
 function loadPSQL() {
 	echo -e "\n\n\nINFO :: Disconnecting clients"
 	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${USER_DB}' AND pid <> pg_backend_pid();";
@@ -52,9 +71,7 @@ function loadPSQL() {
 	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "GRANT ALL PRIVILEGES ON DATABASE ${USER_DB} TO ${POSTGRES_USER};"
 
 	echo "INFO :: Loading database schema"
-	for psql_file in $(cat ${order_file}); do
-		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -f ${watch_folder}/${psql_file} ${USER_DB}
-	done
+	loadSQLFiles "${watch_folder}" "${USER_DB}" "${POSTGRES_USER}" "${POSTGRES_PASSWORD}"
 }
 
 # load PSQL for the first time

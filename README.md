@@ -30,7 +30,7 @@ Since building will be really frequent, we recommend you mounting both `/go/bin`
 
 [Website](https://www.postgresql.org/) - [Base image](https://hub.docker.com/_/postgres/)
 
-Watch for changes in the `/psql`. When a event occurs, it closes all db connections, drops the current database and reload all sources. You need to have an `order` file listing and sorting every SQL files that need to be imported (at the root of your binded folder).
+Watch for changes in the `/psql`. When a event occurs, it closes all db connections, drops the current database and reload all sources. You need to have an `order` file listing and sorting every SQL files that need to be imported (at the root of your binded folder), one file per line. This `order` file may referrence another `order` file (the name must be named `order`).
 
 To run this image:
 
