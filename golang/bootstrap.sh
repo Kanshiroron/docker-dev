@@ -16,6 +16,7 @@ if ! [ -d ${WATCH_FOLDER} ]; then
 	echo "ERROR :: You must mount your golang source folder under '${BASE_FOLDER}''"
 	exit 1
 fi
+cd ${WATCH_FOLDER} # needed for go modules
 output_bin=/go/bin/$(basename ${SOFT_FOLDER})
 exec_bin=/tmp/$(basename ${SOFT_FOLDER})
 export GOPID=/tmp/gosoft.pid
