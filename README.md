@@ -18,10 +18,11 @@ To run this image:
 $ docker run -ti -e SOFT_FOLDER=test -v <your_project_folder>/src:/go/src:ro -v <your_gopath>:/gopath:ro dev/golang
 ```
 
-- `SOFT_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
-- `SOFT_ARGS` (optional): arguments to add to your software.
+- `APP_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
+- `APP_ARGS` (optional): arguments to pass to your app when ran.
 - `COMPILE_ONLY` (boolean, optional): do not run your software once compiled. In this case, your compiled program will sit under `/go/bin` (inside the Docker container). When active, you should also set the `UID` parameter to make sure you are the owner of the ouput program.
-- `UID` (optional): your user id to change the owner of the output program (only active with `COMPILE_ONLY`). 
+- `UID` (optional): your user id to change the owner of the output program (only active with `COMPILE_ONLY`).
+- `WATCH_FOLDER` (optional): Witch folder to watch for changes (to trigger rebuild). If the path doesn't start with a `/`, `/go/src/` will be prefixed to the variable. Defaults to `/go/src`.
 - `<your_gopath>`: this binding is optional. Add it if your project is not included in your gopath.
 
 Since building will be really frequent, we recommend you mounting both `/go/bin` and `/go/pkg` as `tmpfs` ([docker documentation](https://docs.docker.com/storage/tmpfs/)).

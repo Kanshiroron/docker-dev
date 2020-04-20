@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # checking if environment variable have been set
-if ! [ -n "${SOFT_FOLDER}" ]; then
-	echo "ERROR :: You must specify which folder to watch through the variable SOFT_FOLDER (below the 'src' folder)"
+if ! [ -n "${APP_FOLDER}" ]; then
+	echo "ERROR :: You must specify which folder to watch through the variable APP_FOLDER (below the 'src' folder)"
 	exit 1
 fi
 if [ -n "${COMPILE_ONLY}" ]; then
@@ -11,21 +11,37 @@ fi
 
 # checking if folder is mounted
 BASE_FOLDER=/go/src
-WATCH_FOLDER=${BASE_FOLDER}/${SOFT_FOLDER}
-if ! [ -d ${WATCH_FOLDER} ]; then
+APP_FOLDER=${BASE_FOLDER}/${APP_FOLDER}
+if ! [ -d ${APP_FOLDER} ]; then
 	echo "ERROR :: You must mount your golang source folder under '${BASE_FOLDER}''"
 	exit 1
 fi
-cd ${WATCH_FOLDER} # needed for go modules
-output_bin=/go/bin/$(basename ${SOFT_FOLDER})
-exec_bin=/tmp/$(basename ${SOFT_FOLDER})
+# watch folder
+if [ -z "${WATCH_FOLDER}" ]; then
+	WATCH_FOLDER=${BASE_FOLDER}
+else
+	# prefix BASE_FOLDER if WATCH_FOLDER doesn't start with '/'
+	if ! [[ "${WATCH_FOLDER}" =~ ^/.* ]]; then
+		WATCH_FOLDER=${BASE_FOLDER}/${WATCH_FOLDER}
+	fi
+
+	# checking if watch folder exists
+	if ! [ -d ${WATCH_FOLDER} ]; then
+		echo "ERROR :: Watch folder '${WATCH_FOLDER}' doesn't exists"
+		exit 1
+	fi
+fi
+
+cd ${APP_FOLDER} # needed for go modules
+output_bin=/go/bin/$(basename ${APP_FOLDER})
+exec_bin=/tmp/$(basename ${APP_FOLDER})
 export GOPID=/tmp/gosoft.pid
 
 # compiler function
 function compile() {
 	# building service
 	echo "INFO :: Compiling service"
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${output_bin} ${SOFT_FOLDER}
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${output_bin} ${APP_FOLDER}
 
 	# restart service if compilation went well
 	if [ $? -eq 0 ]; then
@@ -53,7 +69,7 @@ function compile() {
 		# starting service
 		echo "INFO :: Starting service"
 		mv ${output_bin} ${exec_bin} # moving to /tmp in case /go/bin is tmpfs (noexec)
-		${exec_bin} ${SOFT_ARGS} &
+		${exec_bin} ${APP_ARGS} &
 		echo $! > ${GOPID}
 	fi
 }
@@ -65,7 +81,7 @@ compile
 echo "INFO :: Starting iwatch to automatically rebuild project inside ${WATCH_FOLDER}"
 while true; do
 	# waiting for files to be modified
-	inotifywait -e create -e delete -e modify -e moved_to -r ${BASE_FOLDER}
+	inotifywait -e create -e delete -e modify -e moved_to -r ${WATCH_FOLDER}
 
 	# rebuilding service
 	compile
