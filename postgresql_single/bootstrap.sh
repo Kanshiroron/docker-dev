@@ -63,12 +63,12 @@ function loadSQLFiles {
 # watch function
 function loadPSQL() {
 	echo -e "\n\n\nINFO :: Disconnecting clients"
-	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${USER_DB}' AND pid <> pg_backend_pid();";
+	PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${USER_DB}' AND pid <> pg_backend_pid();";
 
 	echo "INFO :: Dropping old database"
-	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "DROP DATABASE ${USER_DB};"
-	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "CREATE DATABASE ${USER_DB};"
-	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "GRANT ALL PRIVILEGES ON DATABASE ${USER_DB} TO ${POSTGRES_USER};"
+	PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="DROP DATABASE ${USER_DB};"
+	PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="CREATE DATABASE ${USER_DB};"
+	PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="GRANT ALL PRIVILEGES ON DATABASE ${USER_DB} TO ${POSTGRES_USER};"
 
 	echo "INFO :: Loading database schema"
 	loadSQLFiles "${watch_folder}" "${USER_DB}" "${POSTGRES_USER}" "${POSTGRES_PASSWORD}"

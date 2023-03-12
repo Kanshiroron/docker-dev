@@ -60,11 +60,11 @@ if [ ${#psql_databases[@]} -eq 0 ]; then
 fi
 
 # setting postgres
-if ! [ -n "${POSTGRES_USER}" ]; then
+if [ -n "${POSTGRES_USER}" ]; then
 	export POSTGRES_USER=postgres
 	echo "INFO :: Setting default PostgreSQL user: ${POSTGRES_USER}"
 fi
-if ! [ -n "${POSTGRES_PASSWORD}" ]; then
+if [ -n "${POSTGRES_PASSWORD}" ]; then
 	export POSTGRES_PASSWORD=password
 	echo "INFO :: Setting default PostgreSQL password: ${POSTGRES_PASSWORD}"
 fi
@@ -106,12 +106,13 @@ function watchPSQL {
 	# 4: db user password
 	while true; do
 		echo -e "\n\n\nINFO :: Disconnecting clients"
-		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${2}' AND pid <> pg_backend_pid();";
+		PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${2}' AND pid <> pg_backend_pid();"
 
 		echo "INFO :: Dropping old database"
-		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "DROP DATABASE IF EXISTS ${2};"
-		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "CREATE DATABASE ${2};"
-		PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "GRANT ALL PRIVILEGES ON DATABASE ${2} TO ${3};"
+		PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="DROP DATABASE IF EXISTS ${2};"
+		PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="CREATE DATABASE ${2};"
+		PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="GRANT ALL PRIVILEGES ON DATABASE ${2} TO ${3};"
+		PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${2}" --command="GRANT ALL ON SCHEMA public TO ${3};"
 
 		echo "INFO :: Loading database schema"
 		loadSQLFiles "${watch_folder}/${1}" "${2}" "${3}" "${4}"
@@ -124,7 +125,7 @@ function watchPSQL {
 # creating db users and starting iwatch
 for folder in ${!psql_databases[@]}; do
 	echo "INFO :: Creating ${psql_users[$folder]} db user"
-	PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "CREATE USER ${psql_users[$folder]} WITH PASSWORD '${psql_password[$folder]}';"
+	PGPASSWORD=${POSTGRES_PASSWORD} psql --username="${POSTGRES_USER}" --dbname="${POSTGRES_DB}" --command="CREATE USER ${psql_users[$folder]} WITH PASSWORD '${psql_password[$folder]}';"
 	echo "INFO :: Starting iwatch to automatically reload scripts inside ${watch_folder}/${folder}"
 	watchPSQL "${folder}" "${psql_databases[$folder]}" "${psql_users[$folder]}" "${psql_password[$folder]}" &
 done
