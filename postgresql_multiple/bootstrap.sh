@@ -72,7 +72,7 @@ export POSTGRES_DB=postgres
 
 # starting PostgreSQL
 echo "INFO :: Starting PostgreSQL"
-/usr/local/bin/docker-entrypoint.sh postgres &
+/usr/local/bin/docker-entrypoint.sh postgres $@ &
 
 # waiting for PostgreSQL to be up
 echo "INFO :: Waiting for PostgreSQL to be up"
