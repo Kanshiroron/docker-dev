@@ -24,7 +24,7 @@ for file in $(ls ${watch_folder}); do
 
 	# db name
 	ENV_DB=$(echo ${file} | awk '{print toupper($0)}')_DB
-	if ! [ -n "${!ENV_DB}" ]; then
+	if [ -z "${!ENV_DB}" ]; then
 		DB=$(echo ${file} | awk '{print tolower($0)}')
 		echo "INFO :: ${ENV_DB} environment variable not set, using default: ${DB}"
 		psql_databases["${file}"]=${DB}
@@ -34,7 +34,7 @@ for file in $(ls ${watch_folder}); do
 
 	# db user
 	ENV_USER=$(echo ${file} | awk '{print toupper($0)}')_USER
-	if ! [ -n "${!ENV_USER}" ]; then
+	if [ -z "${!ENV_USER}" ]; then
 		USER=$(echo ${file} | awk '{print tolower($0)}')
 		echo "INFO :: ${ENV_USER} environment variable not set, using default: ${USER}"
 		psql_users["${file}"]=${USER}
@@ -44,7 +44,7 @@ for file in $(ls ${watch_folder}); do
 
 	# db password
 	ENV_PASS=$(echo ${file} | awk '{print toupper($0)}')_PASSWORD
-	if ! [ -n "${!ENV_PASS}" ]; then
+	if [ -z "${!ENV_PASS}" ]; then
 		PASS=$(echo ${file} | awk '{print tolower($0)}')
 		echo "INFO :: ${ENV_PASS} environment variable not set, using default: ${PASS}"
 		psql_password["${file}"]=${PASS}
@@ -60,15 +60,25 @@ if [ ${#psql_databases[@]} -eq 0 ]; then
 fi
 
 # setting postgres
-if [ -n "${POSTGRES_USER}" ]; then
+if [ -z "${POSTGRES_USER}" ]; then
 	export POSTGRES_USER=postgres
 	echo "INFO :: Setting default PostgreSQL user: ${POSTGRES_USER}"
 fi
-if [ -n "${POSTGRES_PASSWORD}" ]; then
+if [ -z "${POSTGRES_PASSWORD}" ]; then
 	export POSTGRES_PASSWORD=password
 	echo "INFO :: Setting default PostgreSQL password: ${POSTGRES_PASSWORD}"
 fi
 export POSTGRES_DB=postgres
+
+# changing postgres UID/GID if needed
+if [ -n "${POSTGRES_USER_UID}" ]; then
+	echo "INFO :: Changing postgres user id to: ${POSTGRES_USER_UID}"
+	usermod -u ${POSTGRES_USER_UID} postgres
+fi
+if [ -n "${POSTGRES_USER_GID}" ]; then
+	echo "INFO :: Changing postgres group id to: ${POSTGRES_USER_GID}"
+	groupmod -g ${POSTGRES_USER_GID} postgres
+fi
 
 # starting PostgreSQL
 echo "INFO :: Starting PostgreSQL"

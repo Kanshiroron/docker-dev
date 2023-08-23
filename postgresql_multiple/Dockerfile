@@ -2,8 +2,10 @@ ARG PG_VERSION
 
 FROM postgres:${PG_VERSION}-alpine
 
-# installing inotify
-RUN apk add --no-cache inotify-tools
+# installing inotify & shadow (for changing postgres UID/GID)
+RUN apk add --no-cache \
+	inotify-tools \
+	shadow
 
 # scripts & entrypoint
 COPY bootstrap.sh /home/

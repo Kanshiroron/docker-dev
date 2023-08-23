@@ -39,9 +39,11 @@ To run this image:
 $ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -v $(pwd):/psql:ro dev/postgresql_single
 ```
 
-- `POSTGRES_USER`: PosgreSQL user name. Optional, defaults to `postgres`
-- `POSTGRES_PASSWORD`: PosgreSQL user password. Optional, defaults to `password`
+- `POSTGRES_USER`: PosgreSQL user name. Optional, defaults to `postgres`.
+- `POSTGRES_PASSWORD`: PosgreSQL user password. Optional, defaults to `password`.
 - `POSTGRES_DB`: PostgreSQL database. Optional, defaults to `mydb`. You CAN'T use `postgres`.
+- `POSTGRES_USER_UID`: Change the default user id for the postgres user (usefull if you need to data mount volumes, certificates, ...).
+- `POSTGRES_USER_GID`: Change the default group id for the postgres user (usefull if you need to data mount volumes, certificates, ...).
 
 You can also use other options listed in the [official image](https://hub.docker.com/_/postgres/).
 
@@ -65,6 +67,8 @@ $ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword \
 - `<FOLDER_NAME | UPPERCASE>_DB`: Name of the database for the `FOLDER_NAME` service. Optional, defaults to the folder name, lower case.
 - `<FOLDER_NAME | UPPERCASE>_USER`: Name of the database user for the `FOLDER_NAME` service. Optional, defaults to the folder name, lower case.
 - `<FOLDER_NAME | UPPERCASE>_PASSWORD`: Name of the database user password for the `FOLDER_NAME` service. Optional, defaults to the folder name, lower case.
+- `POSTGRES_USER_UID`: Change the default user id for the postgres user (usefull if you need to data mount volumes, certificates, ...).
+- `POSTGRES_USER_GID`: Change the default group id for the postgres user (usefull if you need to data mount volumes, certificates, ...).
 
 You can also use other options listed in the [official image](https://hub.docker.com/_/postgres/).
 

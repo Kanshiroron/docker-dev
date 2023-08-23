@@ -15,15 +15,15 @@ if ! [ -f ${order_file} ]; then
 fi
 
 # setting defaults
-if ! [ -n "${POSTGRES_USER}" ]; then
+if [ -z "${POSTGRES_USER}" ]; then
 	export POSTGRES_USER=postgres
 	echo "INFO :: Setting default PostgreSQL user: ${POSTGRES_USER}"
 fi
-if ! [ -n "${POSTGRES_PASSWORD}" ]; then
+if [ -z "${POSTGRES_PASSWORD}" ]; then
 	export POSTGRES_PASSWORD=password
 	echo "INFO :: Setting default PostgreSQL password: ${POSTGRES_PASSWORD}"
 fi
-if ! [ -n "${POSTGRES_DB}" ]; then
+if [ -z "${POSTGRES_DB}" ]; then
 	export USER_DB=mydb
 	echo "INFO :: Setting default PostgreSQL database: ${USER_DB}"
 elif [ "${POSTGRES_DB}" = "postgres" ]; then
@@ -33,6 +33,16 @@ else
 	export USER_DB=${POSTGRES_DB}
 fi
 export POSTGRES_DB=postgres
+
+# changing postgres UID/GID if needed
+if [ -n "${POSTGRES_USER_UID}" ]; then
+	echo "INFO :: Changing postgres user id to: ${POSTGRES_USER_UID}"
+	usermod -u ${POSTGRES_USER_UID} postgres
+fi
+if [ -n "${POSTGRES_USER_GID}" ]; then
+	echo "INFO :: Changing postgres group id to: ${POSTGRES_USER_GID}"
+	groupmod -g ${POSTGRES_USER_GID} postgres
+fi
 
 # starting PostgreSQL
 echo "INFO :: Starting PostgreSQL"
