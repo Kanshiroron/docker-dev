@@ -13,7 +13,7 @@ fi
 BASE_FOLDER=/go/src
 APP_FOLDER=${BASE_FOLDER}/${APP_FOLDER}
 if ! [ -d ${APP_FOLDER} ]; then
-	echo "ERROR :: You must mount your golang source folder under '${BASE_FOLDER}''"
+	echo "ERROR :: You must mount your golang source folder under '${BASE_FOLDER}'"
 	exit 1
 fi
 # watch folder
