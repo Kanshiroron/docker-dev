@@ -1,6 +1,6 @@
 REPO_NAME=dev
 ALPINE_VERSION=3.18
-GOLANG_VERSION=1.21
+GOLANG_VERSION=1.22
 PG_VERSION=15
 
 all: golang postgresql_single postgresql_multiple timescaledb
