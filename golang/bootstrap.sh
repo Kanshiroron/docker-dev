@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# adding custom TLS CA certificates to store
+echo "INFO :: Adding custom certificates to store"
+update-ca-certificates
+
 # checking if environment variable have been set
 if ! [ -n "${APP_FOLDER}" ]; then
 	echo "ERROR :: You must specify which folder to watch through the variable APP_FOLDER (below the 'src' folder)"
