@@ -71,7 +71,7 @@ function start_bin() {
 	echo "INFO :: Starting service"
 	# is it a new build?
 	if [ -f ${output_bin} ]; then
-		rm ${exec_bin}
+		[ -f ${exec_bin} ] && rm ${exec_bin}
 		mv ${output_bin} ${exec_bin} # moving to /tmp in case /go/bin is tmpfs (noexec)
 	fi
 	${exec_bin} ${APP_ARGS} &
