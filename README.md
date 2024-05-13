@@ -32,7 +32,7 @@ Since building will be really frequent, we recommend you mounting both `/go/bin`
 The Golang container contains two binaries to trigger a rebuild (may be usefull when modifications made are outside of the watched folder), and another to restart the watched application. Those two can be found under the `/home` folder of the container.
 
 - `/home/recompile`: recompiles the application and restarts it if the compilation succeeds (and if `COMPILE_ONLY` is not set to `true`).
-- `/home/restart`: kills the running application and starts it again (has no effect if `COMPILE_ONLY` is not set to `true`).
+- `/home/restart`: kills the running application and starts it again (has no effect if `COMPILE_ONLY` is set to `true`).
 
 ## PostgreSQL single
 
