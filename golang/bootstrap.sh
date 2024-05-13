@@ -106,9 +106,11 @@ compile
 
 # starting iwatch
 echo "INFO :: Starting iwatch to automatically rebuild project inside ${WATCH_FOLDER}"
-while read path event file; do
-	echo "INFO :: New ${event} event for file: ${path}${file}"
+while true; do
+	while read path event file; do
+		echo "INFO :: New ${event} event for file: ${path}${file}"
 
-	# rebuilding service
-	compile
-done < <(inotifywait -e create -e delete -e modify -e moved_to -r ${WATCH_FOLDER}) # needed for trap functions to work since otherwise the command blocks the bash thread
+		# rebuilding service
+		compile
+	done < <(inotifywait --quiet --event create --event delete --event modify --event moved_to --recursive ${WATCH_FOLDER}) # needed for trap functions to work since otherwise the command blocks the bash thread
+done
