@@ -9,8 +9,13 @@ if ! [ -n "${APP_FOLDER}" ]; then
 	echo "ERROR :: You must specify which folder to watch through the variable APP_FOLDER (below the 'src' folder)"
 	exit 1
 fi
-if [ -n "${COMPILE_ONLY}" ]; then
+
+# compile only
+if [ -n "${COMPILE_ONLY}" ] && ${COMPILE_ONLY}; then
 	echo "INFO :: Compile only"
+	COMPILE_ONLY=true
+else
+	COMPILE_ONLY=false
 fi
 
 # checking if folder is mounted
@@ -41,6 +46,38 @@ output_bin=/go/bin/$(basename ${APP_FOLDER})
 exec_bin=/tmp/$(basename ${APP_FOLDER})
 export GOPID=/tmp/gosoft.pid
 
+# start bin
+function start_bin() {
+	# do nothing if it's compile only
+	if ${COMPILE_ONLY}; then
+		echo "INFO :: Set to compile only, the application will not be run"
+		return
+	fi
+
+	# killing existing service if any
+	if [ -f ${GOPID} ]; then
+		# killing old process
+		pid=$(cat ${GOPID})
+		echo -e "\n\n\nINFO :: Killing old process ${output_bin} (${pid})"
+		kill ${pid}
+
+		# Waiting for old process to stop
+		echo "INFO :: Waiting for old process to stop"
+		while ps aux | awk '{print $2}' | grep ${pid}; do sleep 1; done
+		rm ${GOPID}
+	fi
+
+	# starting service
+	echo "INFO :: Starting service"
+	# is it a new build?
+	if [ -f ${output_bin} ]; then
+		rm ${exec_bin}
+		mv ${output_bin} ${exec_bin} # moving to /tmp in case /go/bin is tmpfs (noexec)
+	fi
+	${exec_bin} ${APP_ARGS} &
+	echo $! > ${GOPID}
+}
+
 # compiler function
 function compile() {
 	# building service
@@ -50,43 +87,28 @@ function compile() {
 	# restart service if compilation went well
 	if [ $? -eq 0 ]; then
 		# exit if compile only
-		if [ -n "${COMPILE_ONLY}" ] && ${COMPILE_ONLY}; then
-			if [ -n "${UID}" ]; then
-				chown ${UID} ${output_bin}
-			fi
-			return
+		if ${COMPILE_ONLY} && [ -n "${UID}" ]; then
+			chown ${UID} ${output_bin}
 		fi
 
-		# killing existing service if any
-		if [ -f ${GOPID} ]; then
-			# killing old process
-			pid=$(cat ${GOPID})
-			echo -e "\n\n\nINFO :: Killing old process ${output_bin} (${pid})"
-			kill ${pid}
-
-			# Waiting for old process to stop
-			echo "INFO :: Waiting for old process to stop"
-			while ps aux | awk '{print $2}' | grep ${pid}; do sleep 1; done
-			rm ${GOPID} ${exec_bin}
-		fi
-
-		# starting service
-		echo "INFO :: Starting service"
-		mv ${output_bin} ${exec_bin} # moving to /tmp in case /go/bin is tmpfs (noexec)
-		${exec_bin} ${APP_ARGS} &
-		echo $! > ${GOPID}
+		# starting application
+		start_bin
 	fi
 }
+
+# trap functions to rebuild and restart
+echo "INFO :: Setting trap functions for recompile and restart"
+trap "compile" SIGUSR1
+trap "start_bin" SIGUSR2
 
 # building project for the first time
 compile
 
 # starting iwatch
 echo "INFO :: Starting iwatch to automatically rebuild project inside ${WATCH_FOLDER}"
-while true; do
-	# waiting for files to be modified
-	inotifywait -e create -e delete -e modify -e moved_to -r ${WATCH_FOLDER}
+while read path event file; do
+	echo "INFO :: New ${event} event for file: ${path}${file}"
 
 	# rebuilding service
 	compile
-done
+done < <(inotifywait -e create -e delete -e modify -e moved_to -r ${WATCH_FOLDER}) # needed for trap functions to work since otherwise the command blocks the bash thread

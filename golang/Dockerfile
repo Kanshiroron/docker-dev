@@ -13,8 +13,10 @@ RUN apk add --no-cache bash inotify-tools
 ENV GOPATH=/gopath:/go
 
 # entrypoint
-COPY bootstrap.sh /home/
-RUN chown root:root /home/bootstrap.sh && \
-	chmod 750 /home/bootstrap.sh
+COPY bootstrap.sh recompile restart /home/
+RUN for file in bootstrap.sh recompile restart; do \
+	chown root:root /home/${file}; \
+	chmod 750 /home/${file}; \
+	done
 ENTRYPOINT /home/bootstrap.sh
 WORKDIR /go

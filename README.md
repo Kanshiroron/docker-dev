@@ -21,11 +21,18 @@ $ docker run -ti -e SOFT_FOLDER=test -v <your_project_folder>/src:/go/src:ro -v 
 - `APP_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
 - `APP_ARGS` (optional): arguments to pass to your app when ran.
 - `COMPILE_ONLY` (boolean, optional): do not run your software once compiled. In this case, your compiled program will sit under `/go/bin` (inside the Docker container). When active, you should also set the `UID` parameter to make sure you are the owner of the ouput program.
-- `UID` (optional): your user id to change the owner of the output program (only active with `COMPILE_ONLY`).
+- `UID` (optional): your user id to change the owner of the output program (only active when `COMPILE_ONLY` is set to `true`).
 - `WATCH_FOLDER` (optional): Witch folder to watch for changes (to trigger rebuild). If the path doesn't start with a `/`, `/go/src/` will be prefixed to the variable. Defaults to `/go/src`.
 - `<your_gopath>`: this binding is optional. Add it if your project is not included in your gopath.
 
 Since building will be really frequent, we recommend you mounting both `/go/bin` and `/go/pkg` as `tmpfs` ([docker documentation](https://docs.docker.com/storage/tmpfs/)).
+
+### Commands
+
+The container embeds two binaries to trigger a rebuild (may be usefull if the modification made is outside of the watched folder), and another to restart the binary. Those two can be found under the `/home` folder of the container.
+
+- `/home/recompile`: recompiles the application and restarts it if the compilation succeeds (and if `COMPILE_ONLY` is not set to `true`).
+- `/home/restart`: kills the running application and starts it again (has no effect if `COMPILE_ONLY` is not set to `true`).
 
 ## PostgreSQL single
 
