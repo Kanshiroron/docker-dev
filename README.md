@@ -98,7 +98,7 @@ All configuration is done via environment variables.
 - `POSTGRES_USER_UID`: Change the default user id for the postgres user (useful if you need to mount data volumes or certificates).
 - `POSTGRES_USER_GID`: Change the default group id for the postgres user (useful if you need to mount data volumes or certificates).
 
-You can also use other options listed in the [official image](https://hub.docker.com/_/postgres/).
+You can also use other options listed in the [base PostgreSQL image](https://hub.docker.com/_/postgres/).
 
 ### Run
 
