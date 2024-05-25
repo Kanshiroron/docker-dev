@@ -1,4 +1,4 @@
-# Docker images for development
+# Docker Images For Development Purposes
 
 This repository gather some Docker images that helps for development. They all basically watch a folder for changes, and rebuild/reload sources whenever an event occurs. Those images can be found very useful when running a micro-services local environment with [Docker Compose](https://docs.docker.com/compose/).
 
