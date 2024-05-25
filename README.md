@@ -58,7 +58,7 @@ Since building will be really frequent, we recommend you mounting both `/go/bin`
 docker run -ti -e APP_FOLDER=test \
 	-v <your_project_folder>/src:/go/src:ro \
 	-v <your_gopath>:/gopath:ro \
-	dev/kanshiroron/docker-dev-golang:1.22
+	kanshiroron/docker-dev-golang:1.22
 ```
 
 ### Commands
