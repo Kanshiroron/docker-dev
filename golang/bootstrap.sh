@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# adding custom TLS CA certificates to store
-echo "INFO :: Adding custom certificates to store"
-update-ca-certificates
-
 # checking if environment variable have been set
 if ! [ -n "${APP_FOLDER}" ]; then
 	echo "ERROR :: You must specify which folder to watch through the variable APP_FOLDER (below the 'src' folder)"
@@ -17,6 +13,20 @@ if [ -n "${COMPILE_ONLY}" ] && ${COMPILE_ONLY}; then
 else
 	COMPILE_ONLY=false
 fi
+
+# uid/gid
+if [ -n "${APP_UID}" ]; then
+	if [ -z "${APP_GID}" ]; then
+		APP_GID="${APP_UID}"
+	fi
+	echo "INFO :: Adding user uid:gid ${APP_UID}:${APP_GID}"
+	addgroup -g ${APP_GID} golanggroup
+	adduser -G golanggroup -u ${APP_UID} -D -H golanguser
+fi
+
+# adding custom TLS CA certificates to store
+echo "INFO :: Adding custom certificates to store"
+update-ca-certificates
 
 # checking if folder is mounted
 BASE_FOLDER=/go/src
@@ -74,7 +84,11 @@ function start_bin() {
 		[ -f ${exec_bin} ] && rm ${exec_bin}
 		mv ${output_bin} ${exec_bin} # moving to /tmp in case /go/bin is tmpfs (noexec)
 	fi
-	${exec_bin} ${APP_ARGS} &
+	if [ -n "${APP_UID}" ]; then
+		su golanguser -c "${exec_bin} ${APP_ARGS}" &
+	else
+		${exec_bin} ${APP_ARGS} &
+	fi
 	echo $! > ${GOPID}
 }
 
@@ -87,8 +101,8 @@ function compile() {
 	# restart service if compilation went well
 	if [ $? -eq 0 ]; then
 		# exit if compile only
-		if ${COMPILE_ONLY} && [ -n "${UID}" ]; then
-			chown ${UID} ${output_bin}
+		if ${COMPILE_ONLY} && [ -n "${APP_UID}" ]; then
+			chown ${APP_UID} ${output_bin}
 		fi
 
 		# starting application

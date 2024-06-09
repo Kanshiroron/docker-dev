@@ -41,14 +41,19 @@ This image watches for changes in the`/go/src` folder, and when an event occurs 
 
 ### Configuration
 
-All configuration is done via environment variables.
+#### Environment variables
 
 - `APP_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
 - `APP_ARGS` (optional): arguments to pass to your app when ran.
 - `COMPILE_ONLY` (boolean, optional): do not run your software once compiled. In this case, your compiled program will sit under `/go/bin` (inside the Docker container). When active, you should also set the `UID` parameter to make sure you are the owner of the ouput program.
-- `UID` (optional): your user id to change the owner of the output program (only active when `COMPILE_ONLY` is set to `true`).
 - `WATCH_FOLDER` (optional): Witch folder to watch for changes (to trigger rebuild). If the path doesn't start with a `/`, `/go/src/` will be prefixed to the variable. Defaults to `/go/src`.
-- `<your_gopath>`: this binding is optional. Add it if your project is not included in your gopath.
+- `APP_UID` (optional): the id of the user the program should be ran with. If `COMPILE_ONLY` is set to `true`, then it will change the owner of the output binary. This can be usefull if the application writes data to a binded folder (so you do not have to deal with access rights).
+- `APP_GID` (optional): the id of the user group the program should be ran with. Only works if `APP_UID` is set. Defaults to the same value of `APP_UID`.
+
+#### Volumes
+
+- `<your_project_folder>`: (mandatory), this folder contains your Golang project (can be in a sub-folder).
+- `<your_gopath>`: (optional), add it if your project contains depencies that are included in your gopath.
 
 Since building will be really frequent, we recommend you mounting both `/go/bin` and `/go/pkg` as `tmpfs` ([docker documentation](https://docs.docker.com/storage/tmpfs/)).
 
