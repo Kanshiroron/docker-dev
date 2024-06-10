@@ -89,7 +89,7 @@ function start_bin() {
 		while ps aux | awk 'FNR>1 {print $1}' | grep -q ${pid}; do
 			now=$(date +%s)
 			if [ ${now} -ge ${maxdate} ]; then
-				echo "INFO :: The application did not stop within 30 seconds, sending kill signal"
+				echo "INFO :: The application did not stop within ${STOP_TIMEOUT} seconds, sending kill signal"
 				kill -9 ${pid}
 			fi
 			sleep 1
