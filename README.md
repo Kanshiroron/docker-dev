@@ -48,7 +48,8 @@ This image watches for changes in the`/go/src` folder, and when an event occurs 
 - `COMPILE_ONLY` (boolean, optional): do not run your software once compiled. In this case, your compiled program will sit under `/go/bin` (inside the Docker container). When active, you should also set the `UID` parameter to make sure you are the owner of the ouput program.
 - `WATCH_FOLDER` (optional): Witch folder to watch for changes (to trigger rebuild). If the path doesn't start with a `/`, `/go/src/` will be prefixed to the variable. Defaults to `/go/src`.
 - `APP_UID` (optional): the id of the user the program should be ran with. If `COMPILE_ONLY` is set to `true`, then it will change the owner of the output binary. This can be usefull if the application writes data to a binded folder (so you do not have to deal with access rights).
-- `APP_GID` (optional): the id of the user group the program should be ran with. Only works if `APP_UID` is set. Defaults to the same value of `APP_UID`.
+- `APP_GID` (optional, defaults to the same value of `APP_UID`, if set): the id of the user group the program should be ran with. Only works if `APP_UID` is set.
+- `STOP_TIMEOUT` (optional, defaults to `5`): the maximum number of seconds we should wait for the program to stop (after sending the `SIGTERM` signal) Once the timeout reach, the program will be kill with the `SIGKILL` signal.
 
 #### Volumes
 

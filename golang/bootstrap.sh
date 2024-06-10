@@ -24,6 +24,17 @@ if [ -n "${APP_UID}" ]; then
 	adduser -G golanggroup -u ${APP_UID} -D -H golanguser
 fi
 
+# stop timeout
+if [ -n "${STOP_TIMEOUT}" ]; then
+	if ! [[ ${STOP_TIMEOUT} =~ ^[0-9]+$ ]]; then
+		echo "ERROR :: STOP_TIMEOUT is not a positive integer"
+		exit 1
+	fi
+else
+	STOP_TIMEOUT=5
+fi
+echo "INFO :: Stop timeout set to ${STOP_TIMEOUT} seconds"
+
 # adding custom TLS CA certificates to store
 echo "INFO :: Adding custom certificates to store"
 update-ca-certificates
@@ -72,8 +83,17 @@ function start_bin() {
 		kill ${pid}
 
 		# Waiting for old process to stop
-		echo "INFO :: Waiting for old process to stop"
-		while ps aux | awk '{print $2}' | grep ${pid}; do sleep 1; done
+		echo "INFO :: Waiting up to ${STOP_TIMEOUT} seconds for old process to stop"
+		maxdate=$(( $(date +%s) + ${STOP_TIMEOUT} ))
+
+		while ps aux | awk 'FNR>1 {print $1}' | grep -q ${pid}; do
+			now=$(date +%s)
+			if [ ${now} -ge ${maxdate} ]; then
+				echo "INFO :: The application did not stop within 30 seconds, sending kill signal"
+				kill -9 ${pid}
+			fi
+			sleep 1
+		done
 		rm ${GOPID}
 	fi
 
