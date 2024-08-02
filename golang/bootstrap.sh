@@ -14,6 +14,18 @@ else
 	COMPILE_ONLY=false
 fi
 
+# no watch
+if [ -n "${NO_WATCH}" ] && ${NO_WATCH}; then
+	if [ -n "${WATCH_FOLDER}" ]; then
+		echo "ERROR :: Can't have both NO_WATCH set to true, and WATCH_FOLDER set to a value"
+		exit 1
+	fi
+	echo "INFO :: No watch"
+	NO_WATCH=true
+else
+	NO_WATCH=false
+fi
+
 # uid/gid
 if [ -n "${APP_UID}" ]; then
 	if [ -z "${APP_GID}" ]; then
@@ -47,18 +59,20 @@ if ! [ -d ${APP_FOLDER} ]; then
 	exit 1
 fi
 # watch folder
-if [ -z "${WATCH_FOLDER}" ]; then
-	WATCH_FOLDER=${BASE_FOLDER}
-else
-	# prefix BASE_FOLDER if WATCH_FOLDER doesn't start with '/'
-	if ! [[ "${WATCH_FOLDER}" =~ ^/.* ]]; then
-		WATCH_FOLDER=${BASE_FOLDER}/${WATCH_FOLDER}
-	fi
+if ! ${NO_WATCH}; then
+	if [ -z "${WATCH_FOLDER}" ]; then
+		WATCH_FOLDER=${BASE_FOLDER}
+	else
+		# prefix BASE_FOLDER if WATCH_FOLDER doesn't start with '/'
+		if ! [[ "${WATCH_FOLDER}" =~ ^/.* ]]; then
+			WATCH_FOLDER=${BASE_FOLDER}/${WATCH_FOLDER}
+		fi
 
-	# checking if watch folder exists
-	if ! [ -d ${WATCH_FOLDER} ]; then
-		echo "ERROR :: Watch folder '${WATCH_FOLDER}' doesn't exists"
-		exit 1
+		# checking if watch folder exists
+		if ! [ -d ${WATCH_FOLDER} ]; then
+			echo "ERROR :: Watch folder '${WATCH_FOLDER}' doesn't exists"
+			exit 1
+		fi
 	fi
 fi
 
@@ -138,13 +152,20 @@ trap "start_bin" SIGUSR2
 # building project for the first time
 compile
 
-# starting iwatch
-echo "INFO :: Starting iwatch to automatically rebuild project inside ${WATCH_FOLDER}"
-while true; do
-	while read path event file; do
-		echo "INFO :: New ${event} event for file: ${path}${file}"
+if ${NO_WATCH}; then
+	while true; do
+		# must create a non-blocking loop for events to work
+		while read path event file; do echo ""; done < <(inotifywait --quiet --event delete /)
+	done
+else
+	# starting iwatch
+	echo "INFO :: Starting iwatch to automatically rebuild project inside ${WATCH_FOLDER}"
+	while true; do
+		while read path event file; do
+			echo "INFO :: New ${event} event for file: ${path}${file}"
 
-		# rebuilding service
-		compile
-	done < <(inotifywait --quiet --event create --event delete --event modify --event moved_to --recursive ${WATCH_FOLDER}) # needed for trap functions to work since otherwise the command blocks the bash thread
-done
+			# rebuilding service
+			compile
+		done < <(inotifywait --quiet --event create --event delete --event modify --event moved_to --recursive ${WATCH_FOLDER}) # needed for trap functions to work since otherwise the command blocks the bash thread
+	done
+fi

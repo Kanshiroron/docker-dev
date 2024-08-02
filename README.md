@@ -37,7 +37,7 @@ You can change versions by editing the `Makefile`.
 
 [Golang's website](https://golang.org/) - [Base image](https://hub.docker.com/_/golang/)
 
-This image watches for changes in the`/go/src` folder, and when an event occurs it recompiles the programm and runs it if the build is successfull (the old version will not be stopped if the build fails).
+This image watches for changes in the`/go/src` folder, and when an event occurs it recompiles the programm and runs it if the build is successfull (the old version will not be stopped if the build fails). Watch can also be disabled (with the `NO_WATCH` environment variable), so compilations will have to be triggered manually (see the [commands](#commands) section below).
 
 ### Configuration
 
@@ -46,6 +46,7 @@ This image watches for changes in the`/go/src` folder, and when an event occurs 
 - `APP_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
 - `APP_ARGS` (optional): arguments to pass to your app when ran.
 - `COMPILE_ONLY` (boolean, optional): do not run your software once compiled. In this case, your compiled program will sit under `/go/bin` (inside the Docker container). When active, you should also set the `UID` parameter to make sure you are the owner of the ouput program.
+- `NO_WATCH` (boolean, optional): Does not watch for any file change. Compilations will have to be triggered manually (see the [commands](#commands) section below). This option is incompatible with the `WATCH_FOLDER` option.
 - `WATCH_FOLDER` (optional): Witch folder to watch for changes (to trigger rebuild). If the path doesn't start with a `/`, `/go/src/` will be prefixed to the variable. Defaults to `/go/src`.
 - `APP_UID` (optional): the id of the user the program should be ran with. If `COMPILE_ONLY` is set to `true`, then it will change the owner of the output binary. This can be usefull if the application writes data to a binded folder (so you do not have to deal with access rights).
 - `APP_GID` (optional, defaults to the same value of `APP_UID`, if set): the id of the user group the program should be ran with. Only works if `APP_UID` is set.
