@@ -46,6 +46,7 @@ This image watches for changes in the`/go/src` folder, and when an event occurs 
 - `APP_FOLDER`: is the path of your application (main package), from the `src` folder. In previous example, the `test` folder should be located at `<your_project_folder>/src/test` (`/go/src/test` in the container).
 - `APP_ARGS` (optional): arguments to pass to your app when ran.
 - `COMPILE_ONLY` (boolean, optional): do not run your software once compiled. In this case, your compiled program will sit under `/go/bin` (inside the Docker container). When active, you should also set the `UID` parameter to make sure you are the owner of the ouput program.
+- `COMPILATION_EXTRA_ARGS` (string, optional): optionaly define some extra agurments that you want to pass on to the golang compiler.
 - `NO_WATCH` (boolean, optional): Does not watch for any file change. Compilations will have to be triggered manually (see the [commands](#commands) section below). This option is incompatible with the `WATCH_FOLDER` option.
 - `WATCH_FOLDER` (optional): Witch folder to watch for changes (to trigger rebuild). If the path doesn't start with a `/`, `/go/src/` will be prefixed to the variable. Defaults to `/go/src`.
 - `APP_UID` (optional): the id of the user the program should be ran with. If `COMPILE_ONLY` is set to `true`, then it will change the owner of the output binary. This can be usefull if the application writes data to a binded folder (so you do not have to deal with access rights).

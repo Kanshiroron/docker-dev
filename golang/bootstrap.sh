@@ -130,7 +130,8 @@ function start_bin() {
 function compile() {
 	# building service
 	echo "INFO :: Compiling service"
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${output_bin} ${APP_FOLDER}
+	cmd=("go build -a -installsuffix cgo -o ${output_bin} ${COMPILATION_EXTRA_ARGS} ${APP_FOLDER}")
+	eval "${cmd}"
 
 	# restart service if compilation went well
 	if [ $? -eq 0 ]; then

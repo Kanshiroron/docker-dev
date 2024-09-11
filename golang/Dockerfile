@@ -11,6 +11,8 @@ RUN apk add --no-cache bash inotify-tools
 
 # configuration
 ENV GOPATH=/gopath:/go
+ENV CGO_ENABLED=0
+ENV GOOS=linux
 
 # commands
 COPY bootstrap.sh recompile restart /usr/local/bin/
