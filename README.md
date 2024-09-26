@@ -71,7 +71,7 @@ docker run -ti -e APP_FOLDER=test \
 
 ### Commands
 
-The Golang image comes with two binaries, one to trigger a rebuild and another to trigger a restart of the application. Those two binaries can be found under the `/usr/local/bin/` folder of the docker image. This folder is part of the `PATH`, so they are accessible everywhere.
+The Golang image comes with three binaries, one to trigger a rebuild, another to trigger a restart of the application and the last to stop the application (if running). Those three binaries can be found under the `/usr/local/bin/` folder of the docker image. This folder is part of the `PATH`, so they are accessible everywhere.
 
 - `recompile`: recompiles the application and restarts it if the compilation succeeds (and if `COMPILE_ONLY` is not set to `true`). This may be usefull when modifications made are outside of the watched folder (like in the GOPATH).
 - `restart`: stops the running application and starts it again (has no effect if `COMPILE_ONLY` is set to `true`).
