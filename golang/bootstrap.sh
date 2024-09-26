@@ -81,14 +81,8 @@ output_bin=/go/bin/$(basename ${APP_FOLDER})
 exec_bin=/tmp/$(basename ${APP_FOLDER})
 export GOPID=/tmp/gosoft.pid
 
-# start bin
-function start_bin() {
-	# do nothing if it's compile only
-	if ${COMPILE_ONLY}; then
-		echo "INFO :: Set to compile only, the application will not be run"
-		return
-	fi
-
+# stop bin
+function stop_bin() {
 	# killing existing service if any
 	if [ -f ${GOPID} ]; then
 		# killing old process
@@ -110,6 +104,18 @@ function start_bin() {
 		done
 		rm ${GOPID}
 	fi
+}
+
+# start bin
+function start_bin() {
+	# do nothing if it's compile only
+	if ${COMPILE_ONLY}; then
+		echo "INFO :: Set to compile only, the application will not be run"
+		return
+	fi
+
+	# stopping bin if necessary
+	stop_bin
 
 	# starting service
 	echo "INFO :: Starting service"
@@ -146,9 +152,10 @@ function compile() {
 }
 
 # trap functions to rebuild and restart
-echo "INFO :: Setting trap functions for recompile and restart"
-trap "compile" SIGUSR1
-trap "start_bin" SIGUSR2
+echo "INFO :: Setting trap functions for recompile, restart and stop"
+trap compile SIGUSR1
+trap start_bin SIGUSR2
+trap stop_bin SIGINT
 
 # building project for the first time
 compile
