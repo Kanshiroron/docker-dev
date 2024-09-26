@@ -15,11 +15,7 @@ ENV CGO_ENABLED=0
 ENV GOOS=linux
 
 # commands
-COPY bootstrap.sh recompile restart /usr/local/bin/
-RUN for file in recompile restart; do \
-	chown root:root /usr/local/bin/${file}; \
-	chmod 750 /usr/local/bin/${file}; \
-	done
+COPY --chmod=750 --chown=root:root bootstrap.sh recompile restart stop /usr/local/bin/
 
 # entrypoint
 COPY bootstrap.sh /home/
