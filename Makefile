@@ -1,6 +1,6 @@
 REPO_NAME=kanshiroron/docker-dev
-ALPINE_VERSION=3.20
-GOLANG_VERSION=1.23
+ALPINE_VERSION=3.21
+GOLANG_VERSION=1.24
 PG_VERSION=16
 
 all: golang postgresql
