@@ -66,7 +66,7 @@ Since building will be really frequent, we recommend you mounting both `/go/bin`
 docker run -ti -e APP_FOLDER=test \
 	-v <your_project_folder>/src:/go/src:ro \
 	-v <your_gopath>:/gopath:ro \
-	kanshiroron/docker-dev-golang:1.22
+	kanshiroron/docker-dev-golang:1.25
 ```
 
 ### Commands
@@ -118,7 +118,7 @@ docker run -ti -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword \
 	-v $(pwd)/service1/sql:/psql/service1:ro \
 	-v $(pwd)/service2/sql:/psql/service2:ro \
 	-e SERVICE2_DB=myservice -e SERVICE2_USER=myserviceuser -e SERVICE2_PASSWORD=myservicepassword \
-	kanshiroron/docker-dev-postgresql:16
+	kanshiroron/docker-dev-postgresql:18
 ```
 
 ## License
